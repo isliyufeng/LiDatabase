@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lyf.mapper.CourseMapper">
+    <resultMap id="courseMap" type="com.lyf.entity.Course">
+        <id property="id" column="id"/>
+        <result property="courseTitle" column="course_title"/>
+        <result property="courseDesc" column="course_desc"/>
+        <result property="subjectId" column="subject_id"/>
+        <result property="subjectName" column = "subject_name"/>
+    </resultMap>
+    <select id="selectAllCourse" resultMap="courseMap">
+        select * from course
+    </select>
+
+    <select id="selectListByQueryVo"  resultMap="courseMap">
+        select c.*, s.subject_name
+        from course c, subject s
+        <where>
+            c.subject_id = s.id
+            <if test="subjectId > 0">
+                and subject_id = #{subjectId}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectCourseBySubjectId" parameterType="integer" resultMap="courseMap">
+        select c.*, s.subject_name
+        from course c, subject s
+        where c.subject_id = #{subjectId}
+    </select>
+</mapper>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lyf.mapper.SpeakerMapper">
+    <resultMap id="speakerMap" type="com.lyf.entity.Speaker">
+        <id property="id" column="id"/>
+        <result property="speakerName" column="speaker_name"/>
+        <result property="speakerDesc" column="speaker_desc"/>
+        <result property="speakerJob" column="speaker_job"/>
+        <result property="headImgUrl" column="head_img_url"/>
+    </resultMap>
+    <select id="selectAllSpeaker" resultMap="speakerMap">
+        select * from speaker
+    </select>
+
+    <select id="selectQueryVoNum" parameterType="com.lyf.entity.SpeakerQueryVo" resultType="integer">
+        select count(1) from speaker
+        <where>
+            <if test="speakerName != null and speakerName != '' ">
+                and speaker_name like concat('%', #{speakerName}, '%')
+            </if>
+        </where>
+    </select>
+
+    <select id="selectListByQueryVo" parameterType="com.lyf.entity.SpeakerQueryVo" resultMap="speakerMap">
+        select * from speaker s
+        <where>
+            <if test="speakerName != null and speakerName != '' ">
+                and speaker_name like concat('%', #{speakerName}, '%')
+            </if>
+        </where>
+        limit #{begin}, #{rows}
+    </select>
+</mapper>

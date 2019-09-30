@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lyf.mapper.VideoMapper">
+
+    <resultMap id="videoMap" type="com.lyf.entity.Video">
+        <id property="id" column="id"></id>
+        <result property="spearkerId" column="spearker_id"/>
+        <result property="courseId" column="course_id"/>
+        <result property="videoUrl" column="video_url"/>
+        <result property="imageUrl" column="image_url"/>
+        <result property="playNum" column="play_num"/>
+        <result property="speakerName" column="speaker_name"/>
+    </resultMap>
+
+    <resultMap id="videoMap1" type="com.lyf.entity.Video">
+        <id property="id" column="id"></id>
+        <result property="title" column="title"/>
+        <result property="detail" column="detail"/>
+        <result property="time" column="time"/>
+        <result property="spearkerId" column="spearker_id"/>
+        <result property="courseId" column="course_id"/>
+        <result property="videoUrl" column="video_url"/>
+        <result property="imageUrl" column="image_url"/>
+        <result property="playNum" column="play_num"/>
+        <association property="speaker" javaType="com.lyf.entity.Speaker">
+            <id property="id" column="sid"/>
+            <result property="speakerName" column="speaker_name"/>
+            <result property="speakerDesc" column="speaker_desc"/>
+            <result property="headImgUrl" column="head_img_url"/>
+        </association>
+    </resultMap>
+
+
+    <select id="selectListByQueryVo" parameterType="com.lyf.entity.VideoQueryVo" resultMap="videoMap">
+        select v.*, s.speaker_name from video v, speaker s
+        <where>
+            s.id = v.spearker_id
+            <if test="title != null and title != '' ">
+                and title like concat('%', #{title}, '%')
+            </if>
+            <if test="spearkerId != 0">
+                and spearker_id = #{spearkerId}
+            </if>
+            <if test="courseId != 0">
+                and course_id = #{courseId}
+            </if>
+        </where>
+        limit #{begin}, #{rows}
+    </select>
+
+    <select id="selectQueryVoNum" parameterType="com.lyf.entity.VideoQueryVo" resultType="integer">
+        select count(1) from video v, speaker s
+        <where>
+            s.id = v.spearker_id
+            <if test="title != null and title != '' ">
+                and title like concat('%', #{title}, '%')
+            </if>
+            <if test="spearkerId != 0">
+                and spearker_id = #{spearkerId}
+            </if>
+            <if test="courseId != 0">
+                and course_id = #{courseId}
+            </if>
+        </where>
+    </select>
+
+
+    <select id="selectById" parameterType="integer" resultMap="videoMap">
+        select * from video where id = #{id}
+    </select>
+
+    <insert id="save" parameterType="com.lyf.entity.Video">
+        insert into video(title, detail, time, spearker_id, course_id, video_url, image_url)
+        values (#{title}, #{detail}, #{time}, #{spearkerId}, #{courseId}, #{videoUrl}, #{imageUrl})
+    </insert>
+
+    <update id="update" parameterType="com.lyf.entity.Video">
+        update video set id = #{id}, title = #{title}, detail = #{detail},
+         time = #{time}, spearker_id = #{spearkerId}, course_id = #{courseId},
+         video_url = #{videoUrl}, image_url = #{imageUrl}
+         where id = #{id}
+    </update>
+
+    <delete id="delById" parameterType="int">
+        delete from video where id = #{id}
+    </delete>
+
+    <delete id="delBatchVideos" parameterType="integer">
+        delete from video where id in
+        <foreach collection="list" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="getVideoListByCourseId" parameterType="int" resultMap="videoMap">
+        select v.*,s.id sid,s.speaker_name from video v left join speaker s on v.spearker_id=s.id  where course_id=#{courseId}
+    </select>
+
+    <select id="getVideoById" parameterType="integer" resultMap="videoMap1">
+        select v.*, s.id as sid, s.speaker_name, s.speaker_desc, s.head_img_url  from video v left join speaker s on v.spearker_id = s.id
+        where v.id = #{videoId}
+    </select>
+
+</mapper>
